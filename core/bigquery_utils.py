@@ -33,8 +33,8 @@ def get_total_customer_netmonk():
         product,
         REPLACE(FORMAT("%'d", total_customer), ",", ".") AS total_customer_formatted,
         CASE 
-          WHEN persentase > 0 THEN CONCAT('Meningkat sebanyak ', CAST(persentase AS STRING), '%')
-          WHEN persentase < 0 THEN CONCAT('Menurun sebanyak ', CAST(ABS(persentase) AS STRING), '%')
+          WHEN persentase > 0 THEN CONCAT('meningkat sebanyak ', CAST(persentase AS STRING), '%')
+          WHEN persentase < 0 THEN CONCAT('menurun sebanyak ', CAST(ABS(persentase) AS STRING), '%')
           ELSE 'Tetap 0%'
         END AS persentase_updown
       FROM calc
@@ -97,8 +97,8 @@ SELECT
   REPLACE(FORMAT("%'d", total_mau), ",", ".") AS total_mau_formatted,
   FORMAT("%.2f%%", mau_percentage * 100) AS mau_percentage_formatted,
   CASE 
-    WHEN persentase > 0 THEN CONCAT('Meningkat sebanyak ', CAST(persentase AS STRING), '%')
-    WHEN persentase < 0 THEN CONCAT('Menurun sebanyak ', CAST(ABS(persentase) AS STRING), '%')
+    WHEN persentase > 0 THEN CONCAT('meningkat sebanyak ', CAST(persentase AS STRING), '%')
+    WHEN persentase < 0 THEN CONCAT('menurun sebanyak ', CAST(ABS(persentase) AS STRING), '%')
     ELSE 'Tetap 0%'
   END AS growth_mau
 FROM calc
@@ -164,8 +164,8 @@ formatted AS (
     REPLACE(FORMAT("%'d", total_completed), ",", ".") AS total_completed_formatted,
     REPLACE(FORMAT("%'d", total_on_progress), ",", ".") AS total_on_progress_formatted,
     CASE 
-      WHEN growth_percentage > 0 THEN CONCAT('Meningkat sebanyak ', FORMAT("%.2f", growth_percentage), '%')
-      WHEN growth_percentage < 0 THEN CONCAT('Menurun sebanyak ', FORMAT("%.2f", ABS(growth_percentage)), '%')
+      WHEN growth_percentage > 0 THEN CONCAT('meningkat sebanyak ', FORMAT("%.2f", growth_percentage), '%')
+      WHEN growth_percentage < 0 THEN CONCAT('menurun sebanyak ', FORMAT("%.2f", ABS(growth_percentage)), '%')
       ELSE 'Tetap 0%'
     END AS growth_percentage_formatted,
     FORMAT("%.2f%%", growth_percentage) AS growth_percentage_formatted,
@@ -279,3 +279,92 @@ FROM regional_summary
             order_category['total_remaining_order_regional'] = row.total_orders
     
     return order_category
+
+def get_total_devices():
+    client = bigquery.Client.from_service_account_json("service_account1.json")
+
+    QUERY = """
+    WITH monthly AS (
+      -- Prime
+      SELECT
+        'prime' AS product_type,
+        DATE_TRUNC(date, MONTH) AS month,
+        MAX(cumulative_prime_network)
+          + MAX(cumulative_prime_server)
+          + MAX(cumulative_prime_website) AS total_devices
+      FROM `L4_datamart.netmonk_daily_metrics`
+      WHERE DATE_TRUNC(date, MONTH) IN (
+        DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH), MONTH),
+        DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 2 MONTH), MONTH)
+      )
+        AND customer_type = 'non sda'
+      GROUP BY month
+
+      UNION ALL
+
+      -- HI
+      SELECT
+        'hi' AS product_type,
+        DATE_TRUNC(date, MONTH) AS month,
+        MAX(cumulative_hsi_devices) AS total_devices
+      FROM `L4_datamart.netmonk_daily_metrics`
+      WHERE DATE_TRUNC(date, MONTH) IN (
+        DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH), MONTH),
+        DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 2 MONTH), MONTH)
+      )
+        AND customer_type = 'non sda'
+      GROUP BY month
+    ),
+
+    calc AS (
+      SELECT
+        product_type,
+        month,
+        total_devices,
+        LAG(total_devices) OVER(
+          PARTITION BY product_type
+          ORDER BY month
+        ) AS prev_total_devices
+      FROM monthly
+    )
+
+    SELECT
+      product_type,
+      REPLACE(FORMAT("%'d", total_devices), ",", ".") AS total_devices_fmt,
+      ROUND(
+        (total_devices - prev_total_devices) / prev_total_devices * 100,
+        2
+      ) AS growth_percentage
+    FROM calc
+    WHERE month = DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH), MONTH);
+    """
+
+    rows = list(client.query(QUERY).result())
+    data_devices = {}
+
+    for row in rows:
+        growth = row.growth_percentage
+
+        if row.product_type == "prime":
+            data_devices["total_devices_prime"] = row.total_devices_fmt
+            if growth is None:
+                data_devices["growth_devices_prime"] = "Tetap 0%"
+            elif growth > 0:
+                data_devices["growth_devices_prime"] = f"meningkat sebanyak {growth}%"
+            elif growth < 0:
+                data_devices["growth_devices_prime"] = f"menurun sebanyak {abs(growth)}%"
+            else:
+                data_devices["growth_devices_prime"] = "Tetap 0%"
+
+        elif row.product_type == "hi":
+            data_devices["total_devices_hi"] = row.total_devices_fmt
+            if growth is None:
+                data_devices["growth_devices_hi"] = "Tetap 0%"
+            elif growth > 0:
+                data_devices["growth_devices_hi"] = f"meningkat sebanyak {growth}%"
+            elif growth < 0:
+                data_devices["growth_devices_hi"] = f"menurun sebanyak {abs(growth)}%"
+            else:
+                data_devices["growth_devices_hi"] = "Tetap 0%"
+
+    return data_devices
