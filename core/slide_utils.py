@@ -4,6 +4,7 @@ from typing import Dict, Optional
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from google.oauth2 import service_account
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -17,12 +18,27 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive",
 ]
 
+OAUTH_CLIENT_SECRET_FILES = [
+    "credentials_google.json",
+    "credential_google.json",
+]
+SERVICE_ACCOUNT_FILE = "service_account.json"
+
 # =========================
 # Google Auth & Services
 # =========================
+
+def find_oauth_client_secret_file() -> str:
+    for filepath in OAUTH_CLIENT_SECRET_FILES:
+        if os.path.exists(filepath):
+            return filepath
+    return ""
+
+
 def authenticate_google():
     """
-    Autentikasi user Google (OAuth) menggunakan token.json/credentials_google.json.
+    Autentikasi Google dengan OAuth atau service account.
+    Preferensi: token.json -> OAuth client secrets -> service account.
     """
     creds = None
     if os.path.exists("token.json"):
@@ -32,14 +48,27 @@ def authenticate_google():
         if creds and creds.expired and getattr(creds, "refresh_token", None):
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials_google.json", SCOPES
-            )
-            # port=0 agar otomatis memilih port yang bebas
-            creds = flow.run_local_server(port=0)
+            client_secret_file = find_oauth_client_secret_file()
+            if client_secret_file:
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    client_secret_file, SCOPES
+                )
+                creds = flow.run_local_server(port=0)
+            elif os.path.exists(SERVICE_ACCOUNT_FILE):
+                creds = service_account.Credentials.from_service_account_file(
+                    SERVICE_ACCOUNT_FILE, scopes=SCOPES
+                )
+            else:
+                raise FileNotFoundError(
+                    "Tidak menemukan file kredensial Google. "
+                    "Tambahkan salah satu file berikut ke folder project: "
+                    "credentials_google.json, credential_google.json, atau service_account.json. "
+                    "Untuk OAuth, buat file JSON client secrets di Google Cloud Console."
+                )
 
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
+        if not isinstance(creds, service_account.Credentials):
+            with open("token.json", "w") as token:
+                token.write(creds.to_json())
     return creds
 
 

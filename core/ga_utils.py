@@ -11,7 +11,7 @@ from google.analytics.data_v1beta.types import DateRange, Metric, RunReportReque
 # AUTHENTICATION
 # ==========================================================
 SCOPES = ["https://www.googleapis.com/auth/analytics.readonly"]
-CLIENT_SECRET_FILE = "credentials_google.json"
+OAUTH_CLIENT_SECRET_FILES = ["credential_google.json", "credentials_google.json"]
 TOKEN_FILE = "token_ga4.pkl"
 
 # Ganti dengan GA4 Property ID masing-masing produk
@@ -30,7 +30,17 @@ def get_credentials():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, SCOPES)
+            client_secret_file = next(
+                (path for path in OAUTH_CLIENT_SECRET_FILES if os.path.exists(path)),
+                None,
+            )
+            if not client_secret_file:
+                raise FileNotFoundError(
+                    "Tidak menemukan file kredensial Google. "
+                    "Tambahkan salah satu file berikut ke folder project: "
+                    "credential_google.json atau credentials_google.json."
+                )
+            flow = InstalledAppFlow.from_client_secrets_file(client_secret_file, SCOPES)
             creds = flow.run_local_server(port=0)
 
         with open(TOKEN_FILE, "wb") as token:

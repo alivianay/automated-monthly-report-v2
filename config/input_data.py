@@ -5,13 +5,13 @@ from core.ga_utils import get_all_data_netmonk
 LOOKER_DASHBOARD_URL = 'https://lookerstudio.google.com/reporting/08a17056-be12-41b2-9ee2-dfacf316f548'
 
 # slide template dan folder drive
-TEMPLATE_PRESENTATION_ID = 'INPUT YOUR ID' #masukkan TEMPLATE_PRESENTATION_ID
-DESTINATION_FOLDER_ID = 'INPUT YOUR ID' #masukkan DESTINATION_FOLDER_ID
-SCREENSHOT_FOLDER_ID = 'INPUT YOUR ID' #masukkan SCREENSHOT_FOLDER_ID
+TEMPLATE_PRESENTATION_ID = '1qOZFCy_yS1jH2BoPWZ1H2zMvE39ugPjF' #masukkan TEMPLATE_PRESENTATION_ID
+DESTINATION_FOLDER_ID = '1WlbZBW8RCKxtS5vQ_4jYMAk97aQ7ucmB' #masukkan DESTINATION_FOLDER_ID
+SCREENSHOT_FOLDER_ID = '1L3QMI7y92VtqYRsI9F-Wm-ttSwb_2A55' #masukkan SCREENSHOT_FOLDER_ID
 
 
 # slide title & placeholder
-FILE_NAME = 'Monthly Report - November 2025'
+FILE_NAME = 'Monthly Report - Mei 2026'
 
 get_data_customer = get_total_customer_netmonk()
 get_data_mau = get_total_mau()
@@ -22,7 +22,7 @@ get_data_devices = get_total_devices()
 
 
 TEXT_REPLACEMENT = {
-    '{bulan_monthly_report}': 'November 2025',
+    '{bulan_monthly_report}': 'Mei 2026',
 
     # total customer Netmonk, Netmonk Prime, Netmonk Hi
     '{total_customer_netmonk}': get_data_customer["total_customer_netmonk"],
@@ -404,41 +404,41 @@ ELEMENT_TO_CAPTURE = [
     },
 
     # # slide 12 - fixed elements
-    # {
-    #     "selector": "#body > div.lego-reporting-view.activity-view.no-licensed.new-resizer > div > ng2-reporting-plate > plate > div > div > div > div:nth-child(1) > div > div > div > div.pancake-container > div:nth-child(2) > canvas-pancake-adapter > canvas-layout > div > div > div.mainBlockHolder > div > div > div > ng2-report > ng2-canvas-container > div > div:nth-child(17)",
-    #     "slide_index": 11,
-    #     "title" : "Comparison of Network Features",
-    #     "x": 50,
-    #     "y": 10,
-    #     "width": 325,
-    #     "height": 250,
-    #     "tab": "text=Netmonk Prime",
-    #     "wait_for": "text=Comparison of Network Feature"
-    # },
+    {
+        "selector": "#body > div.lego-reporting-view.activity-view.no-licensed.new-resizer > div > ng2-reporting-plate > plate > div > div > div > div:nth-child(1) > div > div > div > div.pancake-container > div:nth-child(2) > canvas-pancake-adapter > canvas-layout > div > div > div.mainBlockHolder > div > div > div > ng2-report > ng2-canvas-container > div > div:nth-child(17)",
+        "slide_index": 11,
+        "title" : "Comparison of Network Features",
+        "x": 50,
+        "y": 10,
+        "width": 325,
+        "height": 250,
+        "tab": "text=Netmonk Prime",
+        "wait_for": "text=Comparison of Network Feature"
+    },
 
-    # {
-    #     "selector": "#body > div.lego-reporting-view.activity-view.no-licensed.new-resizer > div > ng2-reporting-plate > plate > div > div > div > div:nth-child(1) > div > div > div > div.pancake-container > div:nth-child(2) > canvas-pancake-adapter > canvas-layout > div > div > div.mainBlockHolder > div > div > div > ng2-report > ng2-canvas-container > div > div:nth-child(18)",
-    #     "slide_index": 11,
-    #     "title" : "Comparison of Server Features",
-    #     "x": 50,
-    #     "y": 125,
-    #     "width": 325,
-    #     "height": 250,
-    #     "tab": "text=Netmonk Prime",
-    #     "wait_for": "text=Comparison of Server Feature"
-    # },
+    {
+        "selector": "#body > div.lego-reporting-view.activity-view.no-licensed.new-resizer > div > ng2-reporting-plate > plate > div > div > div > div:nth-child(1) > div > div > div > div.pancake-container > div:nth-child(2) > canvas-pancake-adapter > canvas-layout > div > div > div.mainBlockHolder > div > div > div > ng2-report > ng2-canvas-container > div > div:nth-child(18)",
+        "slide_index": 11,
+        "title" : "Comparison of Server Features",
+        "x": 50,
+        "y": 125,
+        "width": 325,
+        "height": 250,
+        "tab": "text=Netmonk Prime",
+        "wait_for": "text=Comparison of Server Feature"
+    },
 
-    # {
-    #     "selector": "#body > div.lego-reporting-view.activity-view.no-licensed.new-resizer > div > ng2-reporting-plate > plate > div > div > div > div:nth-child(1) > div > div > div > div.pancake-container > div:nth-child(2) > canvas-pancake-adapter > canvas-layout > div > div > div.mainBlockHolder > div > div > div > ng2-report > ng2-canvas-container > div > div:nth-child(19)",
-    #     "slide_index": 11,
-    #     "title" : "Comparison of Network Features",
-    #     "x": 50,
-    #     "y": 235,
-    #     "width": 325,
-    #     "height": 250,
-    #     "tab": "text=Netmonk Prime",
-    #     "wait_for": "text=Comparison of Network Feature"
-    # },
+    {
+        "selector": "#body > div.lego-reporting-view.activity-view.no-licensed.new-resizer > div > ng2-reporting-plate > plate > div > div > div > div:nth-child(1) > div > div > div > div.pancake-container > div:nth-child(2) > canvas-pancake-adapter > canvas-layout > div > div > div.mainBlockHolder > div > div > div > ng2-report > ng2-canvas-container > div > div:nth-child(19)",
+        "slide_index": 11,
+        "title" : "Comparison of Network Features",
+        "x": 50,
+        "y": 235,
+        "width": 325,
+        "height": 250,
+        "tab": "text=Netmonk Prime",
+        "wait_for": "text=Comparison of Network Feature"
+    },
 
     # # slide 14 - fixed elements
     # {

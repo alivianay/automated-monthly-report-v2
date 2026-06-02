@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+
+credential_google.json
+service_account.json
+token.json
+token_ga4.pkl
+
+temp/
+debug_full_page.png

@@ -7,7 +7,7 @@ if __name__ == "__main__":
     print("\U0001F4C1 Menyalin template ke folder tujuan...")
     drive_service = get_drive_service()
     new_presentation_id = copy_slide_template(drive_service, TEMPLATE_PRESENTATION_ID, DESTINATION_FOLDER_ID, FILE_NAME)
-    print(f"✅ Slide baru dibuat dengan ID: {new_presentation_id}")
+    print(f"Slide baru dibuat dengan ID: {new_presentation_id}")
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     element_path = os.path.join("output", "screenshots", f"elemen_{timestamp}.png")
@@ -28,4 +28,4 @@ if __name__ == "__main__":
             wait_for=elem.get('wait_for'),
         )
     replace_text_in_google_slide(new_presentation_id, TEXT_REPLACEMENT)
-    print("✅ Semua proses selesai otomatis.")
+    print("Semua proses selesai otomatis.")

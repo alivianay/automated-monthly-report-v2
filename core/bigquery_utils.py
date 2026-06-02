@@ -1,7 +1,7 @@
 from google.cloud import bigquery
 
 def get_total_customer_netmonk():
-    client = bigquery.Client.from_service_account_json("service_account1.json")
+    client = bigquery.Client.from_service_account_json("service_account.json")
 
     QUERY = f"""
       WITH monthly_data AS (
@@ -45,6 +45,10 @@ def get_total_customer_netmonk():
     query_job = client.query(QUERY)
     rows = list(query_job.result())
 
+    print(f"🔍 get_total_customer_netmonk: Query returned {len(rows)} rows")  # ADD THIS
+    for row in rows:
+        print(f"  Row: {row}")
+
     data_customer = {}
     for row in rows:
         if row.product == "Netmonk":
@@ -56,11 +60,12 @@ def get_total_customer_netmonk():
         elif row.product == "Netmonk HI":
             data_customer["total_customer_hi"] = row.total_customer_formatted
             data_customer["persentase_updown_hi"] = row.persentase_updown
-
+    
+    print(f"📊 Final data_customer: {data_customer}")
     return data_customer
 
 def get_total_mau():
-    client = bigquery.Client.from_service_account_json("service_account1.json")
+    client = bigquery.Client.from_service_account_json("service_account.json")
 
     QUERY = f"""
 WITH monthly_data AS (
@@ -107,6 +112,10 @@ WHERE month = DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH), MONTH)
 
     query_job = client.query(QUERY)
     rows = list(query_job.result())
+    
+    print(f"🔍 get_total_mau: Query returned {len(rows)} rows")
+    for row in rows:
+        print(f"  Row: {row}")
 
     data_mau = {}
     for row in rows:
@@ -122,11 +131,12 @@ WHERE month = DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH), MONTH)
             data_mau["total_mau_hi"] = row.total_mau_formatted
             data_mau["mau_percentage_hi"] = row.mau_percentage_formatted
             data_mau["growth_mau_hi"] = row.growth_mau
-
+    
+    print(f"📊 Final data_mau: {data_mau}")
     return data_mau
 
 def get_order_progress():
-    client = bigquery.Client.from_service_account_json("service_account1.json")
+    client = bigquery.Client.from_service_account_json("service_account.json")
 
     QUERY = """
 WITH monthly_data AS (
@@ -180,6 +190,10 @@ WHERE order_month = DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH), MONTH
 
     query_job = client.query(QUERY)
     rows = list(query_job.result())
+    
+    print(f"🔍 get_order_progress: Query returned {len(rows)} rows")
+    for row in rows:
+        print(f"  Row: {row}")
 
     data_orders = {}
     if rows:
@@ -190,11 +204,12 @@ WHERE order_month = DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH), MONTH
         data_orders["completed_orders_percentage"] = row.completed_percentage_formatted
         data_orders["total_on_progress_orders"] = row.total_on_progress_formatted
         data_orders["on_progress_orders_percentage"] = row.on_progress_percentage_formatted
-
+    
+    print(f"📊 Final data_orders: {data_orders}")
     return data_orders
 
 def get_category_order():
-    client = bigquery.Client.from_service_account_json("service_account1.json")
+    client = bigquery.Client.from_service_account_json("service_account.json")
 
     QUERY = """
 WITH base_data AS (
@@ -259,7 +274,11 @@ SELECT
 FROM regional_summary
 """
 
-    rows = client.query(QUERY).result()
+    rows = list(client.query(QUERY).result())
+    
+    print(f"🔍 get_category_order: Query returned {len(rows)} rows")
+    for row in rows:
+        print(f"  Row: {row}")
 
     # Ubah ke dictionary, bukan list
     order_category = {}
@@ -278,10 +297,11 @@ FROM regional_summary
             order_category['remaining_order_regional'] = row.label
             order_category['total_remaining_order_regional'] = row.total_orders
     
+    print(f"📊 Final order_category: {order_category}")
     return order_category
 
 def get_total_devices():
-    client = bigquery.Client.from_service_account_json("service_account1.json")
+    client = bigquery.Client.from_service_account_json("service_account.json")
 
     QUERY = """
     WITH monthly AS (
@@ -340,6 +360,11 @@ def get_total_devices():
     """
 
     rows = list(client.query(QUERY).result())
+    
+    print(f"🔍 get_total_devices: Query returned {len(rows)} rows")
+    for row in rows:
+        print(f"  Row: {row}")
+    
     data_devices = {}
 
     for row in rows:
@@ -366,5 +391,6 @@ def get_total_devices():
                 data_devices["growth_devices_hi"] = f"menurun sebanyak {abs(growth)}%"
             else:
                 data_devices["growth_devices_hi"] = "Tetap 0%"
-
+    
+    print(f"📊 Final data_devices: {data_devices}")
     return data_devices
